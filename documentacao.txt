@@ -1,0 +1,50 @@
+Título: Trabalho Prático 01
+Disciplina: Laboratório de Desenvolvimento de Aplicações Móveis e Distribuidas
+Professor: Rommeu Carneiro
+Alunos: Aline Gonçalves e Otávio Miranda
+
+Protocolo utilizado para a comunicação do Chat:
+
+1. Enviar mensagem:
+
+1.1. Mensagem para todos os usuários:
+	
+	Para que uma mensagem seja para todos os usuários, ao final da mensagem do usuário deverá
+	ser adicionado um ponto e virgula (;) seguido pelo parmetro "TODOS", como no exemplo
+	abaixo:
+	
+		<mensagem_do_usuário>;TODOS
+	
+	Seguindo esse padrão o serviço saberá que a mensagem deverá ser enviada a todos os usuários.
+
+1.2. Mensagem privada:
+
+	Para que uma mensagem seja enviada de modo privado a apenas um usuário, diferente da 
+	mensagem para todos os usuários, ao final da mensagem do usuário deverá ser utilizado o 
+	ponto e virgula ";" seguido	pelo nome de usuário para qual a mensagem será envida, exemplo:
+	
+		<mensagem_do_usuário>;Joao
+
+2. Listar usuários
+
+	Para listar todos os usários conectados no Chat é necessário que o cliente envie para o 
+	servidor uma mensagem com apenas a string "Listar" (sem aspas) e o servidor saberá
+	que o cliente requeriu à lista de usuários conectados e enviar uma mensagem no seguinte
+	padrão:
+	
+		$&$;<nome_cliente1>;<nome_cliente2>;<nome_cliente3> 
+		
+	O padrão "$&$" adotado no início da mensagem serve para o cliente saber que a seguinte
+	mensagem não se trata de uma mensagem normal, mas sim da lista de usuários conectados.
+
+3. Sair do Chat
+	
+	Para sair do chat o cliente deverá enviar ao servidor uma mensagem com apenas a cadeia de
+	caracteres "Sair" (sem aspas) e o servidor identificará que o usuário deseja se desconectar 
+	do Chat e fará todo o processo necessário para que isso ocorra.
+	
+4. Entrar no Chat
+	
+	Para que o usuário entre no Chat o cliente deverá enviar apenas uma mensagem contendo o
+	nome do usuário, com isso, o servidor identificará que o cliente deseja ser adicionado ao
+	chat.

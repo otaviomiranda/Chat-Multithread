@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 
 public class Servidor extends Thread {
 
-	// private static ArrayList <BufferedWriter> clientes;
 	private static ArrayList<Usuario> listaClientes;
 	private static ServerSocket server;
 	private String nome;
@@ -24,12 +23,7 @@ public class Servidor extends Thread {
 	private InputStreamReader inr;
 	private BufferedReader bfr;
 
-	/**
-	 * Método construtor
-	 * 
-	 * @param com
-	 *            do tipo Socket
-	 */
+
 	public Servidor(Socket con) {
 		this.con = con;
 		try {
@@ -41,9 +35,6 @@ public class Servidor extends Thread {
 		}
 	}
 
-	/**
-	 * Método run
-	 */
 	public void run() {
 
 		try {
@@ -64,14 +55,16 @@ public class Servidor extends Thread {
 
 				String[] str = new String[2];
 				str = msg.split(";");
-				System.out.println(str[1]);
 
 				if (str[1].equalsIgnoreCase("TODOS")) {
-					System.out.println("PASSOU AQ");
-					sendToAll(bfw, str[1]);
-					System.out.println(str[1]);
-				} else {
-					System.out.println("PASSOU NO ELSE");
+					sendToAll(bfw, str[0]);
+				} else if (str[1].equalsIgnoreCase("LISTA")) {
+					getListaClientes(bfw);
+				}
+				else if (str[1].equalsIgnoreCase("SAIR")){
+					System.out.println("Saiu");
+				}
+				else {
 					sendPrivateMsg(bfw, str[0], str[1]);
 				}
 
@@ -83,15 +76,6 @@ public class Servidor extends Thread {
 		}
 	}
 
-	/***
-	 * Método usado para enviar mensagem para todos os clients
-	 * 
-	 * @param bwSaida
-	 *            do tipo BufferedWriter
-	 * @param msg
-	 *            do tipo String
-	 * @throws IOException
-	 */
 	public void sendToAll(BufferedWriter bwSaida, String msg) throws IOException {
 		BufferedWriter bwS;
 		for (Usuario u : listaClientes) {
@@ -103,12 +87,6 @@ public class Servidor extends Thread {
 			}
 		}
 
-		/*
-		 * BufferedWriter bwS; for (BufferedWriter bw : clientes) {
-		 * 
-		 * bwS = (BufferedWriter) bw; if (!(bwSaida == bwS)) { bw.write(nome + " -> " +
-		 * msg + "\r\n"); bw.flush(); } }
-		 */
 	}
 
 	public void sendPrivateMsg(BufferedWriter bwSaida, String msg, String destinatario) throws IOException {
@@ -119,32 +97,40 @@ public class Servidor extends Thread {
 			bwS = (BufferedWriter) u.getBw();
 			if (!(bwSaida == bwS)) {
 				if (u.getNome().equalsIgnoreCase(destinatario)) {
-					u.getBw().write(nome + " -> " + msg + "\r\n");
+					u.getBw().write("MENSAGEM PRIVADA DE  " + nome + " -> " + msg + "\r\n");
 					u.getBw().flush();
 				}
 			}
 		}
-		/*
-		 * System.out.println("ENTROU NA FUNC"); BufferedWriter bwS; for (int i = 0; i <
-		 * clientes.size(); i++) { System.out.println("ENTROU NO FOR"); bwS =
-		 * clientes.get(i); if (!(bwSaida == bwS)) { if
-		 * (listaNome.get(i).equalsIgnoreCase(destinatario)) {
-		 * System.out.println("ENTROU NO IF DO NOME"); clientes.get(i).write(nome +
-		 * " -> " + msg + "\r\n"); clientes.get(i).flush(); } } }
-		 */
 	}
 
-	/***
-	 * Método main
-	 * 
-	 * @param args
-	 */
+	public void getListaClientes(BufferedWriter bwSaida) throws IOException {
+		String str = "";
+		String[] vetorNomes = new String[3];
+
+		for (Usuario u : listaClientes) {
+			str += ";" + u.getNome();
+		}
+
+		vetorNomes = str.split(";");
+		bwSaida.write("\n\nLISTA DE USUÁRIOS CONECTADOS" + "\r\n");
+		bwSaida.flush();
+
+		for (int i = 0; i < vetorNomes.length; i++) {
+			bwSaida.write("     " + vetorNomes[i] + "\r\n");
+			bwSaida.flush();
+		}
+
+		bwSaida.write("\n\n Observação: Para mandar uma \n mensagem privada, digite a \n mensagem  seguida por \n   ;nomeDoUsuário" + "\r\n\n\n");
+		bwSaida.flush();
+	}
+
 	public static void main(String[] args) {
 
 		try {
-			// Cria os objetos necessário para instânciar o servidor
+			// Cria os objetos necessários para instânciar o servidor
 			JLabel lblMessage = new JLabel("Porta do Servidor:");
-			JTextField txtPorta = new JTextField("12345");
+			JTextField txtPorta = new JTextField("8000");
 			Object[] texts = { lblMessage, txtPorta };
 			JOptionPane.showMessageDialog(null, texts);
 			server = new ServerSocket(Integer.parseInt(txtPorta.getText()));
@@ -163,5 +149,5 @@ public class Servidor extends Thread {
 
 			e.printStackTrace();
 		}
-	}// Fim do método main
-} // Fim da classe
+	}
+}
